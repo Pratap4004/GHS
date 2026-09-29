@@ -57,8 +57,9 @@ jobs:
         working-directory: frontend
         run: |
           docker build \
+            -f frontend/Dockerfile \
             -t asia-south1-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/$IMAGE_NAME:${{ github.sha }} \
-            .
+            frontend
 
       - name: Push Docker image to GAR
         run: |
