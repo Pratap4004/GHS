@@ -1,0 +1,478 @@
+name: Backend Build and Push to GAR
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: project-e4b58c33-b31e-44d9-a36
+  GAR_LOCATION: asia-south1
+  GAR_REPOSITORY: ghs
+
+jobs:
+
+  # ============================================================
+  # Announcement Service
+  # ============================================================
+
+  announcement-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Announcement Service
+        working-directory: backend/announcement-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/announcement-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/announcement-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/announcement-service:${{ github.sha }}
+
+
+  # ============================================================
+  # Attendance Service
+  # ============================================================
+
+  attendance-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Attendance Service
+        working-directory: backend/attendance-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/attendance-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/attendance-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/attendance-service:${{ github.sha }}
+
+
+  # ============================================================
+  # Auth Service
+  # ============================================================
+
+  auth-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Auth Service
+        working-directory: backend/auth-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/auth-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/auth-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/auth-service:${{ github.sha }}
+
+
+  # ============================================================
+  # Exam Service
+  # ============================================================
+
+  exam-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Exam Service
+        working-directory: backend/exam-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/exam-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/exam-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/exam-service:${{ github.sha }}
+
+
+  # ============================================================
+  # Fee Service
+  # ============================================================
+
+  fee-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Fee Service
+        working-directory: backend/fee-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/fee-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/fee-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/fee-service:${{ github.sha }}
+
+
+  # ============================================================
+  # Gallery Service
+  # ============================================================
+
+  gallery-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Gallery Service
+        working-directory: backend/gallery-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/gallery-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/gallery-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/gallery-service:${{ github.sha }}
+
+
+  # ============================================================
+  # Homework Service
+  # ============================================================
+
+  homework-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Homework Service
+        working-directory: backend/homework-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/homework-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/homework-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/homework-service:${{ github.sha }}
+
+
+  # ============================================================
+  # Notification Service
+  # ============================================================
+
+  notification-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Notification Service
+        working-directory: backend/notification-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/notification-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/notification-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/notification-service:${{ github.sha }}
+
+
+  # ============================================================
+  # Student Service
+  # ============================================================
+
+  student-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Student Service
+        working-directory: backend/student-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/student-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/student-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/student-service:${{ github.sha }}
+
+
+  # ============================================================
+  # Teacher Service
+  # ============================================================
+
+  teacher-service:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+
+      - name: Build and test Teacher Service
+        working-directory: backend/teacher-service
+        run: mvn clean package
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: gcloud auth configure-docker $GAR_LOCATION-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: backend/teacher-service
+        run: |
+          docker build \
+            -f Dockerfile \
+            -t $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/teacher-service:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            $GAR_LOCATION-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/teacher-service:${{ github.sha }}
