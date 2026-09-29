@@ -1,0 +1,66 @@
+name: Frontend Build and Push to GAR
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: project-e4b58c33-b31e-44d9-a36
+  GAR_LOCATION: asia-south1
+  GAR_REPOSITORY: ghs
+  IMAGE_NAME: frontend
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm install
+
+      - name: Run tests
+        working-directory: frontend
+        run: npm test
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
+          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+
+      - name: Configure Docker authentication
+        run: |
+          gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+
+      - name: Build Docker image
+        working-directory: frontend
+        run: |
+          docker build \
+            -t asia-south1-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/$IMAGE_NAME:${{ github.sha }} \
+            .
+
+      - name: Push Docker image to GAR
+        run: |
+          docker push \
+            asia-south1-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/$IMAGE_NAME:${{ github.sha }}
