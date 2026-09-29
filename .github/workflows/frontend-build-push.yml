@@ -23,60 +23,63 @@ jobs:
 
     steps:
 
-      # 1. Checkout GitHub repository
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      # 2. Install Node.js on GitHub Actions runner
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3. Install frontend dependencies
-      # npm is available only on the GitHub Actions runner
       - name: Install dependencies
         working-directory: frontend
         run: npm install
 
-      # 4. Run frontend tests
       - name: Run tests
         working-directory: frontend
         run: npm test
 
-      # 5. Build React/Vite application
-      # This creates frontend/dist/
       - name: Build frontend
         working-directory: frontend
         run: npm run build
 
-      # 6. Authenticate GitHub Actions with Google Cloud
-      # Uses Workload Identity Federation
+      - name: Verify frontend build files
+        run: |
+          echo "Current directory:"
+          pwd
+
+          echo "Repository contents:"
+          ls -la
+
+          echo "Frontend contents:"
+          ls -la frontend
+
+          echo "Dockerfile:"
+          cat frontend/Dockerfile
+
+          echo "Build output:"
+          ls -la frontend/dist
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
           service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
 
-      # 7. Install/setup gcloud on GitHub Actions runner
       - name: Setup Google Cloud CLI
         uses: google-github-actions/setup-gcloud@v2
 
-      # 8. Configure Docker authentication for Artifact Registry
       - name: Configure Docker authentication
         run: |
           gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
 
-      # 9. Build Docker image
-      # Dockerfile is inside frontend/
-      # Build context is ./frontend
       - name: Build Docker image
         run: |
           docker build \
+            -f frontend/Dockerfile \
             -t asia-south1-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/$IMAGE_NAME:${{ github.sha }} \
-            ./frontend
+            frontend
 
-      # 10. Push Docker image to Google Artifact Registry
       - name: Push Docker image to GAR
         run: |
           docker push \
