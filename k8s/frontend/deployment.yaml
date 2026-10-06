@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+
+
+Metadata:
+  name: frontend
+  namespace: ghs
+  labels:
+    app: frontend
+
+
+  spec:
+    replicas: 2
+
+    selector:
+      matchLabels:
+        app: frontend
+
+    
+    template:
+      metadata:
+        labels:
+          app: frontend
+
+
+      spec:
+        containers:
+          - name: frontend
+            images: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ghs/frontend:6bcf1feec5c123180fa46612413db11e9486c0c8
+            ports:
+              - containerPort: 80

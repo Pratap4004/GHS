@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: announcement-service
+  namespace: ghs
+spec:
+  type: ClusterIP
+  selector:
+    app: announcement-service
+  ports:
+    - protocol: TCP
+      port: 8088
+      targetPort: 8088
