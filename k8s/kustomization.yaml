@@ -1,0 +1,9 @@
+resources:
+  - frontend/deployment.yaml
+  - frontend/service.yaml
+  - backend/auth/deployment.yaml
+  - backend/auth/service.yaml
+  - backend/attendance/deployment.yaml
+  - backend/attendance/service.yaml
+  - backend/announcement/deployment.yaml
+  - backend/announcement/service.yaml
