@@ -1,0 +1,25 @@
+replicaCount: 2
+
+fullnameOverride: student-service
+
+image:
+  repository: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ghs/student-service
+  tag: "6bcf1feec5c123180fa46612413db11e9486c0c8"
+  pullPolicy: IfNotPresent
+
+containerPort: 8082
+
+service:
+  type: ClusterIP
+  port: 8082
+
+database:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

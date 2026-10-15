@@ -1,0 +1,32 @@
+replicaCount: 2
+
+image:
+  repository: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ghs/student-service
+  tag: "6bcf1feec5c123180fa46612413db11e9486c0c8"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+containerPort: 8082
+
+service:
+  type: ClusterIP
+  port: 8082
+
+database:
+  enabled: true
+  host: "10.43.206.2"
+  port: 5432
+  name: student_db
+  existingSecret: ghs-db-secret
+  usernameKey: DB_USERNAME
+  passwordKey: DB_PASSWORD
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
