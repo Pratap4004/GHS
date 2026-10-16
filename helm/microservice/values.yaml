@@ -16,12 +16,12 @@ service:
 
 database:
   enabled: true
-  host: "10.43.206.2"
+  host: "10.63.0.3"
   port: 5432
   name: student_db
   existingSecret: ghs-db-secret
-  usernameKey: DB_USERNAME
-  passwordKey: DB_PASSWORD
+  usernameKey: username
+  passwordKey: password
 
 resources:
   requests:

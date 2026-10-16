@@ -1,4 +1,4 @@
-replicaCount: 2
+replicaCount: 1
 
 fullnameOverride: student-service
 
@@ -14,7 +14,7 @@ service:
   port: 8082
 
 database:
-  enabled: false
+  enabled: true
 
 resources:
   requests:
