@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: notification-service
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Pratap4004/GHS.git
+    targetRevision: main
+    path: helm/microservice
+    helm:
+      valueFiles:
+        - values/notification-service.yaml
+      parameters:
+        - name: fullnameOverride
+          value: notification-service
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ghs
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=false

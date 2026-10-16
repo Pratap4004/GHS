@@ -1,0 +1,31 @@
+replicaCount: 1
+
+fullnameOverride: exam-service
+
+image:
+  repository: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ghs/exam-service
+  tag: "6bcf1feec5c123180fa46612413db11e9486c0c8"
+  pullPolicy: IfNotPresent
+
+containerPort: 8086
+
+service:
+  type: ClusterIP
+  port: 8086
+
+database:
+  enabled: true
+  host: "10.63.0.3"
+  port: 5432
+  name: exam_db
+  existingSecret: ghs-db-secret
+  usernameKey: username
+  passwordKey: password
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
