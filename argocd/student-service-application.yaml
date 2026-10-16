@@ -1,8 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
+
 metadata:
   name: student-service
   namespace: argocd
+
 spec:
   project: default
 
@@ -19,9 +21,5 @@ spec:
     namespace: ghs
 
   syncPolicy:
-    automated:
-      enabled: true
-      prune: false
-      selfHeal: true
     syncOptions:
       - CreateNamespace=false
