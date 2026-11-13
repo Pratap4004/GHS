@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-build-push.yml'
 
   workflow_dispatch:
 
@@ -57,13 +60,14 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      
       - name: Build Docker image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build \
             -f frontend/Dockerfile \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$GITHUB_SHA \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:frontend-latest \
             frontend
 
       - name: Push Docker image to Amazon ECR
@@ -71,4 +75,5 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker push \
-            $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$GITHUB_SHA
+            $ECR_REGISTRY/$ECR_REPOSITORY:frontend-latest
+

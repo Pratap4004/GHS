@@ -5,6 +5,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-build-push.yml'
 
   workflow_dispatch:
 
@@ -61,6 +64,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
+      
       - name: Build Docker image
         working-directory: backend/${{ matrix.service }}
         env:
@@ -69,7 +73,7 @@ jobs:
         run: |
           docker build \
             -f Dockerfile \
-            -t $ECR_REGISTRY/$ECR_REPOSITORY:$SERVICE_NAME-$GITHUB_SHA \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$SERVICE_NAME-latest \
             .
 
       - name: Push Docker image to Amazon ECR
@@ -78,4 +82,5 @@ jobs:
           SERVICE_NAME: ${{ matrix.service }}
         run: |
           docker push \
-            $ECR_REGISTRY/$ECR_REPOSITORY:$SERVICE_NAME-$GITHUB_SHA
+            $ECR_REGISTRY/$ECR_REPOSITORY:$SERVICE_NAME-latest
+
