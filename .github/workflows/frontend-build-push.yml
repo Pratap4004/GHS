@@ -1,4 +1,5 @@
-name: Frontend Build and Push to GAR
+
+name: Frontend Build and Push to AWS ECR
 
 on:
   push:
@@ -12,9 +13,8 @@ permissions:
   id-token: write
 
 env:
-  PROJECT_ID: project-e4b58c33-b31e-44d9-a36
-  GAR_LOCATION: asia-south1
-  GAR_REPOSITORY: ghs
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: ghs
   IMAGE_NAME: frontend
 
 jobs:
@@ -22,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout source code
         uses: actions/checkout@v4
 
@@ -43,44 +42,33 @@ jobs:
         working-directory: frontend
         run: npm run build
 
-      - name: Verify frontend build files
+      - name: Verify frontend build
         run: |
-          echo "Current directory:"
-          pwd
-
-          echo "Repository contents:"
-          ls -la
-
-          echo "Frontend contents:"
-          ls -la frontend
-
-          echo "Dockerfile:"
-          cat frontend/Dockerfile
-
-          echo "Build output:"
           ls -la frontend/dist
+          test -f frontend/Dockerfile
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+      - name: Configure AWS credentials using OIDC
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          workload_identity_provider: projects/142823644639/locations/global/workloadIdentityPools/github-actions-ghs/providers/github
-          service_account: github-actions-ghs@project-e4b58c33-b31e-44d9-a36.iam.gserviceaccount.com
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Setup Google Cloud CLI
-        uses: google-github-actions/setup-gcloud@v2
-
-      - name: Configure Docker authentication
-        run: |
-          gcloud auth configure-docker asia-south1-docker.pkg.dev --quiet
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Docker image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build \
             -f frontend/Dockerfile \
-            -t asia-south1-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/$IMAGE_NAME:${{ github.sha }} \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$GITHUB_SHA \
             frontend
 
-      - name: Push Docker image to GAR
+      - name: Push Docker image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker push \
-            asia-south1-docker.pkg.dev/$PROJECT_ID/$GAR_REPOSITORY/$IMAGE_NAME:${{ github.sha }}
+            $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_NAME-$GITHUB_SHA
