@@ -1,9 +1,9 @@
 replicaCount: 2
 
 image:
-  repository: asia-south1-docker.pkg.dev/project-e4b58c33-b31e-44d9-a36/ghs/student-service
-  tag: "6bcf1feec5c123180fa46612413db11e9486c0c8"
-  pullPolicy: IfNotPresent
+  repository: 480815637772.dkr.ecr.ap-south-1.amazonaws.com/ghs
+  tag: "student-service-latest"
+  pullPolicy: Always
 
 nameOverride: ""
 fullnameOverride: ""

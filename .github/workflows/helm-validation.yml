@@ -1,0 +1,84 @@
+name: Helm Chart Validation
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'helm/microservice/**'
+      - '.github/workflows/helm-validation.yml'
+
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'helm/microservice/**'
+      - '.github/workflows/helm-validation.yml'
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate ${{ matrix.service }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - announcement-service
+          - attendance-service
+          - auth-service
+          - exam-service
+          - fee-service
+          - gallery-service
+          - homework-service
+          - notification-service
+          - student-service
+          - teacher-service
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Validate default Helm configuration
+        run: |
+          helm lint helm/microservice
+          helm template default-release helm/microservice > default-rendered.yaml
+
+      - name: Helm lint
+        run: |
+          helm lint helm/microservice \
+            -f helm/microservice/values/${{ matrix.service }}.yaml
+
+      - name: Render Kubernetes manifests
+        run: |
+          helm template ${{ matrix.service }} \
+            helm/microservice \
+            -f helm/microservice/values/${{ matrix.service }}.yaml \
+            > rendered.yaml
+
+      - name: Verify rendered image
+        run: |
+          EXPECTED_IMAGE="480815637772.dkr.ecr.ap-south-1.amazonaws.com/ghs:${{ matrix.service }}-latest"
+
+          if ! grep -Fq "image: \"$EXPECTED_IMAGE\"" rendered.yaml; then
+            echo "ERROR: Expected image not found: $EXPECTED_IMAGE"
+            cat rendered.yaml
+            exit 1
+          fi
+
+          echo "Verified image: $EXPECTED_IMAGE"
+
+      - name: Verify Kubernetes resources
+        run: |
+          grep -q "^kind: Deployment" rendered.yaml
+          grep -q "^kind: Service" rendered.yaml
+
+          echo "Deployment and Service manifests generated successfully."
