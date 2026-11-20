@@ -15,9 +15,9 @@ service:
 
 database:
   enabled: true
-  host: "10.63.0.3"
+  host: "postgres"
   port: 5432
-  name: announcement_db
+  name: ghs_db
   existingSecret: ghs-db-secret
   usernameKey: username
   passwordKey: password

@@ -15,6 +15,12 @@ service:
 
 database:
   enabled: true
+  host: "postgres"
+  port: 5432
+  name: ghs_db
+  existingSecret: ghs-db-secret
+  usernameKey: username
+  passwordKey: password
 
 resources:
   requests:
