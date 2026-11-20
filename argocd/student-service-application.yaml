@@ -15,11 +15,17 @@ spec:
     helm:
       valueFiles:
         - values/student-service.yaml
+      parameters:
+        - name: fullnameOverride
+          value: student-service
 
   destination:
     server: https://kubernetes.default.svc
     namespace: ghs
 
   syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
     syncOptions:
       - CreateNamespace=false
